@@ -25,7 +25,7 @@ static class JsonHelp {
 
     public static void WritePropertyObject<T>(this Utf8JsonWriter writer, string name, T obj) {
         writer.WritePropertyName(name);
-        JsonSerializer.Serialize<T>(writer, obj);
+        JsonSerializer.Serialize<T>(writer, obj, SerializerOptions);
     }
 }
 

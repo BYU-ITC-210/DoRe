@@ -14,8 +14,7 @@ namespace DnsForItLearningLabs
 
         [Function("Dump")]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "api/dump")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "api/dump")] HttpRequest req)
         {
             {
                 var response = AccessControl.AuthenticateRequest(req);

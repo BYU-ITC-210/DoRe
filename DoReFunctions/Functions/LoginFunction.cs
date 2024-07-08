@@ -14,15 +14,20 @@ namespace DnsForItLearningLabs
     /// <summary>
     /// Back door login for testing purposes
     /// </summary>
-    public static class LoginFunction
+    public class LoginFunction
     {
         const string c_unHashPassword = "HashPassword";
 
+        ILogger<LoginFunction> m_logger;
+
+        public LoginFunction(ILogger<LoginFunction> logger) {
+            m_logger = logger;
+        }
+
         [Function("Login")]
-        public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "api/login")] HttpRequest req,
-            ILogger log)
-         {
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "api/login")] HttpRequest req)
+        {
             {
                 var result = AccessControl.AuthorizeAnonymousRequest(req);
                 if (result is not null) return result;
@@ -30,7 +35,7 @@ namespace DnsForItLearningLabs
 
             if (req.Method == "POST" && req.ContentType.StartsWith("application/json"))
             {
-                return LoginJson(req, log);
+                return await LoginJson(req);
             }
 
             var authToken = AccessControl.GetAuthentication(req);
@@ -38,7 +43,7 @@ namespace DnsForItLearningLabs
             {
                 if (req.Query.ContainsKey("logout"))
                 {
-                    log.LogInformation("Logout.");
+                    m_logger.LogInformation("Logout.");
                     AccessControl.ClearAuthCookie(req.HttpContext);
                     return new ContentResult()
                     {
@@ -80,7 +85,7 @@ namespace DnsForItLearningLabs
                 {
                     var signedToken = AccessControl.SignToken(req.HttpContext, token);
 
-                    log.LogInformation(new EventId(3, "Login"), "un={un}", un);
+                    m_logger.LogInformation(new EventId(3, "Login"), "un={un}", un);
 
                     return new JsonAccessTokenResult(signedToken, AccessControl.TokenExpiration);
                 }
@@ -94,14 +99,14 @@ namespace DnsForItLearningLabs
             };
         }
 
-        static IActionResult LoginJson(HttpRequest req, ILogger log)
+        async Task<IActionResult> LoginJson(HttpRequest req)
         {
-            var login = JsonSerializer.Deserialize<LoginReqModel>(req.Body);
+            var login = await JsonSerializer.DeserializeAsync<LoginReqModel>(req.Body, JsonHelp.SerializerOptions);
             var token = ValidateUnPw(login.Username, login.Password);
             if (token is null) return new MessageResult(StatusCodes.Status401Unauthorized, "Invalid username or password.");
             var signedToken = AccessControl.SignToken(req.HttpContext, token);
 
-            log.LogInformation(new EventId(3, "Login"), "un={un}", login.Username);
+            m_logger.LogInformation(new EventId(3, "Login"), "un={un}", login.Username);
 
             return new JsonAccessTokenResult(signedToken, AccessControl.TokenExpiration);
         }

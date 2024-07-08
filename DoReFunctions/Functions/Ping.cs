@@ -18,9 +18,11 @@ namespace DnsForItLearningLabs
 
     public class Ping
     {
+        ILogger<Ping> m_logger;
 
         public Ping(ILogger<Ping> logger)
         {
+            m_logger = logger;
             Console.WriteLine("Ping constructor.");
             logger.LogInformation("Ping constructor information");
             logger.LogWarning("Ping constructor warning");
@@ -30,11 +32,10 @@ namespace DnsForItLearningLabs
 
         [Function("Ping")]
         public IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/ping")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/ping")] HttpRequest req)
         {
-            Console.WriteLine(log.GetType().FullName);
-            log.LogInformation("Ping");
+            Console.WriteLine(m_logger.GetType().FullName);
+            m_logger.LogInformation("Ping");
 
             var sb = new StringBuilder();
 
@@ -74,7 +75,7 @@ namespace DnsForItLearningLabs
                 var logger = lf.CreateLogger("Function.Longo.User");
                 Console.WriteLine("Hello from Ping!");
                 if (logger is not null) logger.LogInformation("To LoggerFactory.CreateLogger Hello from Ping!");
-                log.LogInformation("Direct log from Ping!");
+                m_logger.LogInformation("Direct log from Ping!");
 
                 sb.AppendLine();
                 sb.AppendLine("------------------");

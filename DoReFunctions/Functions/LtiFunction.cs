@@ -12,14 +12,19 @@ using Microsoft.Extensions.Primitives;
 
 namespace DnsForItLearningLabs
 {
-    public static class LtiFunction
+    public class LtiFunction
     {
         const string c_invalidLtiMessage = "Invalid LTI Authentication.";
 
+        ILogger<LtiFunction> m_logger;
+        public LtiFunction(ILogger<LtiFunction> logger)
+        {
+            m_logger = logger;
+        }
+
         [Function("LtiFunction")]
-        public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "api/lti")] HttpRequest req,
-            ILogger log)
+        public IActionResult Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "api/lti")] HttpRequest req)
         {
             // Provide CORS support
             {
@@ -40,7 +45,7 @@ namespace DnsForItLearningLabs
                 { "o", $"{req.Scheme}://{req.Host}" } // Set origin to the destination, not the origin of this call
             };
 
-            log.LogInformation(new EventId(4, "LTI"), "un={un} name={name}", req.Form["user_id"], req.Form["lis_person_name_full"]);
+            m_logger.LogInformation(new EventId(4, "LTI"), "un={un} name={name}", req.Form["user_id"], req.Form["lis_person_name_full"]);
 
             return new SetTokenAndRedirectResult(AccessControl.SignToken(req.HttpContext, st), "/c/");
         }

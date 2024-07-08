@@ -15,8 +15,7 @@ namespace DnsForItLearningLabs
     {
         [Function("UtilFunction")]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "util")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "util")] HttpRequest req)
         {
             if (req.Method == "GET")
             {

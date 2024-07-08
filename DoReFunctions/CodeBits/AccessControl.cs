@@ -453,9 +453,9 @@ namespace Bredd.CodeBit
 
         const string c_jsonBody =
 @"{{
-    ""access_token"": ""{0}"",
-    ""token_type"": ""Bearer"",
-    ""expires_in"": ""{1}""
+    ""accessToken"": ""{0}"",
+    ""tokenType"": ""Bearer"",
+    ""expiresIn"": ""{1}""
 }}";
 
     } // Class JsonAccessTokenResult

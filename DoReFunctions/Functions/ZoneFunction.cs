@@ -21,8 +21,8 @@ namespace DnsForItLearningLabs
 
         [Function("ZoneFunction")]
         public static Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", Route = "/api/zone/{domain?}/{recType?}")] HttpRequest req,
-            string domain, string recType, ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", "delete", "options", Route = "api/zone/{domain?}/{recType?}")] HttpRequest req,
+            string domain, string recType)
         {
             // Require authentication
             {
@@ -30,14 +30,14 @@ namespace DnsForItLearningLabs
                 if (response is not null) return Task.FromResult(response);
             }
 
-            log.LogInformation(new EventId(5, "Zone"), "un={un} verb={verb} domain={domain} recType={recType}", AccessControl.GetSessionToken(req.HttpContext)["un"], req.Method, domain, recType);
+            //log.LogInformation(new EventId(5, "Zone"), "un={un} verb={verb} domain={domain} recType={recType}", AccessControl.GetSessionToken(req.HttpContext)["un"], req.Method, domain, recType);
 
             if (domain is null)
             {
                 // Only GET is supported when no domain given.
                 if (!string.Equals(req.Method, "GET", StringComparison.OrdinalIgnoreCase))
                     return Task.FromResult<IActionResult>(new MessageResult(StatusCodes.Status400BadRequest, "Must use 'GET' when no domain specified."));
-                return GetAllOwnedDomains(req, log);
+                return GetAllOwnedDomains(req);
             }
 
             if (domain[0] == '_') return Task.FromResult<IActionResult>(new MessageResult(StatusCodes.Status400BadRequest, "Domain name must not start with underscore."));
@@ -77,7 +77,7 @@ namespace DnsForItLearningLabs
             }
         }
 
-        static async Task<IActionResult> GetAllOwnedDomains(HttpRequest req, ILogger log)
+        static async Task<IActionResult> GetAllOwnedDomains(HttpRequest req)
         {
             var dnsZone = AzureDns.GetDnsZone();
 

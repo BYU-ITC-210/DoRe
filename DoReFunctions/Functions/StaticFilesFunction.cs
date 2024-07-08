@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DnsForItLearningLabs.Functions
 {
-    public static class StaticFilesFunction
+    public class StaticFilesFunction
     {
         // Hard to find the docs on this but the * before "path" indicates that there may be any number of slashes in the path
         const string c_route = "c/{*path}";
@@ -18,10 +18,16 @@ namespace DnsForItLearningLabs.Functions
 
         static string s_physicalBasePath = null;
 
+        ILogger<StaticFilesFunction> m_logger;
+
+        public StaticFilesFunction(ILogger<StaticFilesFunction> logger) {
+            m_logger = logger;
+        }
+
         [Function("StaticFiles")]
-        public static IActionResult Run(
+        public IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = c_route)]
-            HttpRequest req, ILogger log)
+            HttpRequest req)
         {
             // Load the configuration if this is the first time in.
             if (s_physicalBasePath is null)
@@ -33,7 +39,7 @@ namespace DnsForItLearningLabs.Functions
                         ?? Environment.GetEnvironmentVariable("HOME") + "/site/wwwroot";  
                 }
                 s_physicalBasePath = Path.Combine(root, c_physicalPrefix);
-                log.LogInformation($"StaticFilesFunction: root={s_physicalBasePath}");
+                m_logger.LogInformation($"StaticFilesFunction: root={s_physicalBasePath}");
             }
 
             //log.LogInformation($"StaticFilesFunction Path: Path={req.Path} PathBase={req.PathBase}");
@@ -49,7 +55,7 @@ namespace DnsForItLearningLabs.Functions
             // Security check = doesn't use /, \, or .. to get to stuff it shouldn't reach
             if (!physicalPath.StartsWith(s_physicalBasePath))
             {
-                log.LogWarning("Access denied, attempt to violate path constraint.");
+                m_logger.LogWarning("Access denied, attempt to violate path constraint.");
                 return new BadRequestResult();
             }
 
@@ -69,13 +75,13 @@ namespace DnsForItLearningLabs.Functions
                 }
                 if (!found)
                 {
-                    log.LogWarning($"File not found: {physicalPath + s_defaultExtensions[0]}");
+                    m_logger.LogWarning($"File not found: {physicalPath + s_defaultExtensions[0]}");
                     return new NotFoundResult();
                 }
             }
             else if (!File.Exists(physicalPath))
             {
-                log.LogWarning($"File not found: {physicalPath}");
+                m_logger.LogWarning($"File not found: {physicalPath}");
                 return new NotFoundResult();
             }
 
@@ -91,7 +97,7 @@ namespace DnsForItLearningLabs.Functions
                     if (File.Exists(altPath)
                         && File.GetLastWriteTimeUtc(altPath) > File.GetLastWriteTimeUtc(physicalPath))
                     {
-                        log.LogInformation($"Substituting updated file: {altPath}");
+                        m_logger.LogInformation($"Substituting updated file: {altPath}");
                         physicalPath = altPath;
                     }
                 }

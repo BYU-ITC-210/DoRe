@@ -8,10 +8,10 @@ namespace DnsForItLearningLabs.Functions
 {
     public static class RootFunction
     {
-        [Function("RootFunction")]
+        [Function("ZZZRoot")]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "/")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{page:?}")] HttpRequest req,
+            string page = "")
         {
             Console.WriteLine("Root");
             Console.WriteLine($"{req.Method} {req.Path}");

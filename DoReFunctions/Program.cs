@@ -8,10 +8,13 @@ using DnsForItLearningLabs;
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication(builder => {
         // Set default JSON Serialization options
-        builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions => {
-            jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            jsonSerializerOptions.Converters.Add(JsonDateTimeConverter.Instance);
+        // This mostly affects JsonResult
+        builder.Services.AddControllers().AddJsonOptions(options => {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            options.JsonSerializerOptions.Converters.Add(JsonDateTimeConverter.Instance);
+            options.JsonSerializerOptions.WriteIndented = true;
+            options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
         });
     })
     .ConfigureServices(services => {
