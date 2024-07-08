@@ -20,8 +20,9 @@ namespace DnsForItLearningLabs
 
         ILogger<LoginFunction> m_logger;
 
-        public LoginFunction(ILogger<LoginFunction> logger) {
+        public LoginFunction(ILogger<LoginFunction> logger, IServiceProvider serviceProvider) {
             m_logger = logger;
+            Console.WriteLine(serviceProvider?.GetType().FullName);
         }
 
         [Function("Login")]
