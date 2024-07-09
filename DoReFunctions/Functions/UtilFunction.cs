@@ -1,81 +1,67 @@
-using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System.Net.Mime;
+using System.Security.Cryptography;
 using System.Text;
 using Bredd.CodeBit;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Azure.Functions.Worker;
 
-namespace DnsForItLearningLabs
-{
-    public static class UtilFunction
-    {
-        [Function("UtilFunction")]
-        public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "util")] HttpRequest req)
-        {
-            if (req.Method == "GET")
-            {
-                return new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    ContentType = MediaTypeNames.Text.Html,
-                    Content = c_utilPage
-                };
-            }
+namespace DnsForItLearningLabs;
 
-            switch (req.Form["action"])
-            {
-                case "hashPassword":
-                    return HashPasswordAction(req);
-
-                case "generateKey":
-                    return GenerateKeyAction(req);
-            }
-
-            return DefaultAction(req);
-        }
-
-        static IActionResult HashPasswordAction(HttpRequest req)
-        {
-            return new ContentResult()
-            {
-                ContentType = MediaTypeNames.Text.Plain,
-                Content = string.Format(c_hashPasswordContent, req.Form["un"], PasswordHash.Hash((string?)req.Form["pw"] ?? string.Empty), req.Form["accountType"])
-            };
-        }
-
-        static IActionResult GenerateKeyAction(HttpRequest req)
-        {
-            var key = WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(24));
-            var url = string.Concat(req.Scheme, "://", req.Host, "/api/lti");
-            return new ContentResult()
-            {
-                ContentType = MediaTypeNames.Text.Plain,
-                Content = string.Format(c_generateKeyContent, req.Form["keyName"], key, url)
-            };
-        }
-
-        static IActionResult DefaultAction(HttpRequest req)
-        {
-            var sb = new StringBuilder();
-            foreach(var pair in req.Form)
-            {
-                sb.AppendLine($"{pair.Key}={pair.Value}");
-            }
-
-            return new ContentResult()
-            {
+public static class UtilFunction {
+    [Function("UtilFunction")]
+    public static IActionResult Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "util")] HttpRequest req) {
+        if (req.Method == "GET") {
+            return new ContentResult() {
                 StatusCode = StatusCodes.Status200OK,
-                ContentType = MediaTypeNames.Text.Plain,
-                Content = sb.ToString()
+                ContentType = MediaTypeNames.Text.Html,
+                Content = c_utilPage
             };
         }
 
-        const string c_utilPage =
+        switch (req.Form["action"]) {
+        case "hashPassword":
+            return HashPasswordAction(req);
+
+        case "generateKey":
+            return GenerateKeyAction(req);
+        }
+
+        return DefaultAction(req);
+    }
+
+    static IActionResult HashPasswordAction(HttpRequest req) {
+        return new ContentResult() {
+            ContentType = MediaTypeNames.Text.Plain,
+            Content = string.Format(c_hashPasswordContent, req.Form["un"], PasswordHash.Hash((string?)req.Form["pw"] ?? string.Empty), req.Form["accountType"])
+        };
+    }
+
+    static IActionResult GenerateKeyAction(HttpRequest req) {
+        var key = WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(24));
+        var url = string.Concat(req.Scheme, "://", req.Host, "/api/lti");
+        return new ContentResult() {
+            ContentType = MediaTypeNames.Text.Plain,
+            Content = string.Format(c_generateKeyContent, req.Form["keyName"], key, url)
+        };
+    }
+
+    static IActionResult DefaultAction(HttpRequest req) {
+        var sb = new StringBuilder();
+        foreach (var pair in req.Form) {
+            sb.AppendLine($"{pair.Key}={pair.Value}");
+        }
+
+        return new ContentResult() {
+            StatusCode = StatusCodes.Status200OK,
+            ContentType = MediaTypeNames.Text.Plain,
+            Content = sb.ToString()
+        };
+    }
+
+    const string c_utilPage =
 @"<!DOCTYPE html>
 <html>
 <head>
@@ -116,14 +102,14 @@ namespace DnsForItLearningLabs
 </html>";
 
 
-        const string c_hashPasswordContent =
+    const string c_hashPasswordContent =
 @"Direct accounts should only be used for administraton and testing. Most accounts should authenticate through LTI.
 
 Use the Azure Portal to add the following tag to the DNS service:
 name:  user_{0}
 value: {2};{1}";
 
-        const string c_generateKeyContent =
+    const string c_generateKeyContent =
 @"This key will grant a Tool Consumer such as an LMS access to the DNS tool. First, use the Azure Portal to add the following tag to the DNS service:
 name:  lti_{0}
 value: {1}
@@ -133,7 +119,5 @@ url:    {2}
 key:    {0}
 secret: {1}
 ";
-
-    }
 
 }

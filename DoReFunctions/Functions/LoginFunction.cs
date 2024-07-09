@@ -1,13 +1,10 @@
-using System;
-using System.Web;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using Bredd.CodeBit;
 using FileMeta.CodeBit;
-using System.Text;
-using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 
 namespace DnsForItLearningLabs;
 

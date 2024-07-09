@@ -1,14 +1,13 @@
 ﻿// When published as a CodeBit, this will be Bredd.AzureFunctions.AccessControl
 
-using System;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using FileMeta.CodeBit;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Primitives;
 
 namespace Bredd.CodeBit;
 

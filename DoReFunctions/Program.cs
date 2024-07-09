@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Bredd.CodeBit;
+using DnsForItLearningLabs;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DnsForItLearningLabs;
-using Bredd.CodeBit;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication(builder => {
