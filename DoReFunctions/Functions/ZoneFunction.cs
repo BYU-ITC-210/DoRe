@@ -162,7 +162,7 @@ namespace DnsForItLearningLabs
                 if (domain.IndexOf('.') >= 0)
                     return new MessageResult(StatusCodes.Status400BadRequest, "Must be a plain name with no dot.");
 
-                var newRecord = JsonSerializer.Deserialize<SubDomainRecord>(req.Body)!;
+                var newRecord = (await JsonSerializer.DeserializeAsync<SubDomainRecord>(req.Body, JsonHelp.SerializerOptions))!;
 
                 if (!string.IsNullOrWhiteSpace(newRecord.Name) && !string.Equals(domain, newRecord.Name, StringComparison.Ordinal))
                     return new MessageResult(StatusCodes.Status400BadRequest, "Name doesn't match path.");
@@ -383,7 +383,7 @@ namespace DnsForItLearningLabs
         {
             try
             {
-                var newRecord = JsonSerializer.Deserialize<T>(req.Body)!;
+                var newRecord = (await JsonSerializer.DeserializeAsync<T>(req.Body, JsonHelp.SerializerOptions))!;
 
                 var dnsZone = AzureDns.GetDnsZone();
                 if (!await VerifyAccess(req, dnsZone, domain)) return MessageResult.ForbiddenResult;
