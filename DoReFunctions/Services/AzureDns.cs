@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Azure.ResourceManager;
 using Azure.ResourceManager.Dns;
 using Bredd.CodeBit;
@@ -67,19 +68,20 @@ namespace DnsForItLearningLabs
             try
             {
                 var content = ex.GetRawResponse()?.Content?.ToString();
-                if (content == null) return new MessageResult(ex.Status, ex.Message);
-                var json = JsonSerializer.Deserialize<AzureErrorMessage>(content)!;
-                return new MessageResult(ex.Status, json.Message);
+                if (content is not null) {
+                    var json = JsonNode.Parse(content);
+                    if (json is not null) {
+                        var message = (string?)json["message"];
+                        if (message is not null)
+                            return new MessageResult(ex.Status, message);
+                    }
+                }
             }
             catch
             {
-                return new MessageResult(ex.Status, ex.Message);
+                // Do nothing except fall through
             }
-        }
-
-        private class AzureErrorMessage
-        {
-            public string Message { get; set; }
+            return new MessageResult(ex.Status, ex.Message);
         }
 
     }
