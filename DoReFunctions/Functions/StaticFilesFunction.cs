@@ -16,7 +16,7 @@ namespace DnsForItLearningLabs.Functions
 
         static string[] s_defaultExtensions = new string[] { ".html", ".htm" };
 
-        static string s_physicalBasePath = null;
+        static string? s_physicalBasePath = null;
 
         ILogger<StaticFilesFunction> m_logger;
 

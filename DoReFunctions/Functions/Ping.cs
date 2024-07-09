@@ -49,7 +49,7 @@ namespace DnsForItLearningLabs
                 foreach (System.Collections.DictionaryEntry de in Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process))
                 {
                     string key = de.Key as string ?? string.Empty;
-                    string value = de.Value as string;
+                    string value = de.Value as string ?? string.Empty;
                     sb.AppendLine($"{key}: {value}");
                 }
                 sb.AppendLine();
@@ -71,7 +71,7 @@ namespace DnsForItLearningLabs
                 }
                 sb.AppendLine();
 
-                ILoggerFactory lf = context.RequestServices.GetService<ILoggerFactory>();
+                ILoggerFactory lf = context.RequestServices.GetService<ILoggerFactory>() ?? throw new ApplicationException("Failed to retrieve ILoggerFactory");
                 var logger = lf.CreateLogger("Function.Longo.User");
                 Console.WriteLine("Hello from Ping!");
                 if (logger is not null) logger.LogInformation("To LoggerFactory.CreateLogger Hello from Ping!");

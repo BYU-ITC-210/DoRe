@@ -20,9 +20,8 @@ namespace DnsForItLearningLabs
 
         ILogger<LoginFunction> m_logger;
 
-        public LoginFunction(ILogger<LoginFunction> logger, IServiceProvider serviceProvider) {
+        public LoginFunction(ILogger<LoginFunction> logger) {
             m_logger = logger;
-            Console.WriteLine(serviceProvider?.GetType().FullName);
         }
 
         [Function("Login")]
@@ -34,7 +33,7 @@ namespace DnsForItLearningLabs
                 if (result is not null) return result;
             }
 
-            if (req.Method == "POST" && req.ContentType.StartsWith("application/json"))
+            if (req.Method == "POST" && req.ContentType is not null &&  req.ContentType.StartsWith("application/json"))
             {
                 return await LoginJson(req);
             }
@@ -54,7 +53,7 @@ namespace DnsForItLearningLabs
                 }
 
                 var sb = new StringBuilder();
-                foreach (var datum in req.HttpContext.GetSessionToken())
+                foreach (var datum in req.HttpContext.GetSessionToken()!)
                 {
                     sb.Append($"{datum.Key}={datum.Value} ");
                 }
@@ -68,8 +67,8 @@ namespace DnsForItLearningLabs
             bool loginFailure = false;
             if (req.HasFormContentType)
             {
-                string un = req.Form["username"];
-                string pw = req.Form["password"];
+                string? un = req.Form["username"];
+                string? pw = req.Form["password"];
 
                 // Generate a password hash for direct login purposes
                 if (string.Equals(un, c_unHashPassword) && !string.IsNullOrWhiteSpace(pw))
@@ -102,7 +101,7 @@ namespace DnsForItLearningLabs
 
         async Task<IActionResult> LoginJson(HttpRequest req)
         {
-            var login = await JsonSerializer.DeserializeAsync<LoginReqModel>(req.Body, JsonHelp.SerializerOptions);
+            LoginReqModel login = (await JsonSerializer.DeserializeAsync<LoginReqModel>(req.Body, JsonHelp.SerializerOptions))!;
             var token = ValidateUnPw(login.Username, login.Password);
             if (token is null) return new MessageResult(StatusCodes.Status401Unauthorized, "Invalid username or password.");
             var signedToken = AccessControl.SignToken(req.HttpContext, token);
@@ -112,8 +111,10 @@ namespace DnsForItLearningLabs
             return new JsonAccessTokenResult(signedToken, AccessControl.TokenExpiration);
         }
 
-        static SessionToken ValidateUnPw(string un, string pw)
+        static SessionToken? ValidateUnPw(string? un, string? pw)
         {
+            if (un is null || pw is null)
+                return null;
             // See if there's a matching record
             var tag = AzureDns.ReadTag("user_" + un);
             if (string.IsNullOrWhiteSpace(tag)) return null;
@@ -149,6 +150,10 @@ namespace DnsForItLearningLabs
 
         class LoginReqModel
         {
+            LoginReqModel() {
+                Username = Password = string.Empty;            
+            }
+
             public string Username { get; set; }
             public string Password { get; set; }
         }
@@ -156,6 +161,10 @@ namespace DnsForItLearningLabs
         // This matches the standard OAuth response per https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
         class LoginResModel
         {
+            LoginResModel() {
+                access_token = token_type = string.Empty;
+            }
+
             public string access_token { get; set; }
 
             public string token_type { get; set; }

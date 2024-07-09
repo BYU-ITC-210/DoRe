@@ -44,7 +44,7 @@ namespace DnsForItLearningLabs
             return new ContentResult()
             {
                 ContentType = MediaTypeNames.Text.Plain,
-                Content = string.Format(c_hashPasswordContent, req.Form["un"], PasswordHash.Hash(req.Form["pw"]), req.Form["accountType"])
+                Content = string.Format(c_hashPasswordContent, req.Form["un"], PasswordHash.Hash((string?)req.Form["pw"] ?? string.Empty), req.Form["accountType"])
             };
         }
 

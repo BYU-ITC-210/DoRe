@@ -82,7 +82,8 @@ namespace DnsForItLearningLabs
             var dnsZone = AzureDns.GetDnsZone();
 
             // Collect the records
-            var user = AccessControl.GetSessionToken(req.HttpContext)["un"];
+            var user = AccessControl.GetSessionToken(req.HttpContext)?["un"];
+            if (user is null) throw new ApplicationException("Failed to retrieve session token or user.");
             var domainRecords = await dnsZone.GetOwnedDomainsAsync(user);
             var aRecords = new List<ARecord>();
             var aaaaRecords = new List<AaaaRecord>();
@@ -144,7 +145,10 @@ namespace DnsForItLearningLabs
             if (domainRec == null)
                 return MessageResult.NotFoundResult;
 
-            var user = AccessControl.GetSessionToken(req.HttpContext)["un"];
+            var user = AccessControl.GetSessionToken(req.HttpContext)?["un"];
+            if (user is null)
+                throw new ApplicationException("Failed to retrieve session token or user.");
+
             if (!string.Equals(domainRec.Owner, user, StringComparison.Ordinal))
                 return MessageResult.ForbiddenResult;
 
@@ -164,6 +168,7 @@ namespace DnsForItLearningLabs
                     return new MessageResult(StatusCodes.Status400BadRequest, "Name doesn't match path.");
 
                 var sessionToken = AccessControl.GetSessionToken(req.HttpContext);
+                if (sessionToken is null) throw new ApplicationException("Failed to retrieve session token.");
                 var user = sessionToken["un"];
 
                 var dnsZone = AzureDns.GetDnsZone();
@@ -190,7 +195,7 @@ namespace DnsForItLearningLabs
                 newRecord.Name = domain;
                 newRecord.Owner = user;
                 newRecord.OwnerName = sessionToken.GetValueOrDefault("n") ?? string.Empty;
-                newRecord.Created = (create) ? DateTime.UtcNow : existing.Created;
+                newRecord.Created = (create) ? DateTime.UtcNow : existing!.Created;
                 newRecord.Updated = DateTime.UtcNow;
 
                 await SubDomainRecordAccessor.Instance.CreateOrUpdateAsync(dnsZone, newRecord);
@@ -211,7 +216,7 @@ namespace DnsForItLearningLabs
 
         static async Task<IActionResult> DeleteDomain(HttpRequest req, string domain)
         {
-            var user = AccessControl.GetSessionToken(req.HttpContext)["un"];
+            var user = AccessControl.GetSessionToken(req.HttpContext)?["un"];
 
             var dnsZone = AzureDns.GetDnsZone();
 
@@ -359,7 +364,7 @@ namespace DnsForItLearningLabs
             if (srvRecordResource == null) return false;
 
             var owner = srvRecordResource.Data.Metadata.GetString("owner");
-            var user = AccessControl.GetSessionToken(req.HttpContext)["un"];
+            var user = AccessControl.GetSessionToken(req.HttpContext)?["un"];
             return string.Equals(owner, user, StringComparison.Ordinal);
         }
 
@@ -378,7 +383,7 @@ namespace DnsForItLearningLabs
         {
             try
             {
-                var newRecord = JsonSerializer.Deserialize<T>(req.Body);
+                var newRecord = JsonSerializer.Deserialize<T>(req.Body)!;
 
                 var dnsZone = AzureDns.GetDnsZone();
                 if (!await VerifyAccess(req, dnsZone, domain)) return MessageResult.ForbiddenResult;
@@ -391,7 +396,7 @@ namespace DnsForItLearningLabs
                 if (newRecord.Ttl <= 0) newRecord.Ttl = c_defaultTtl;
 
                 newRecord.Name = domain;
-                newRecord.Created = create ? DateTime.UtcNow : existing.Created;
+                newRecord.Created = create ? DateTime.UtcNow : existing!.Created;
                 newRecord.Updated = DateTime.UtcNow;
 
                 await accessor.CreateOrUpdateAsync(dnsZone, newRecord);

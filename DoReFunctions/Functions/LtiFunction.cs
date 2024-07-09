@@ -39,9 +39,9 @@ namespace DnsForItLearningLabs
 
             var st =new SessionToken
             {
-                { "un", req.Form["user_id"] },
+                { "un", (string?)req.Form["user_id"] ?? string.Empty },
                 { "r", "user" },
-                { "n", req.Form["lis_person_name_full"] },
+                { "n", (string?)req.Form["lis_person_name_full"] ?? string.Empty },
                 { "o", $"{req.Scheme}://{req.Host}" } // Set origin to the destination, not the origin of this call
             };
 
