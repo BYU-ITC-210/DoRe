@@ -18,7 +18,6 @@ namespace Bredd.CodeBit
 
         public static bool ValidateOAuthSignature(string method, string url, IEnumerable<KeyValuePair<string, StringValues>> values, string secret)
         {
-
             var calcSig = InternalGetOAuthSignature(method, url, values, secret, out string foundSignature, out string foundTimestamp);
             if (!string.Equals(calcSig, foundSignature, StringComparison.OrdinalIgnoreCase)) return false;
             if (foundTimestamp is null) return false;
@@ -37,13 +36,13 @@ namespace Bredd.CodeBit
         public static string InternalGetOAuthSignature(string method, string url, IEnumerable<KeyValuePair<string, StringValues>> values, string secret,
             out string foundSignature, out string foundTimestamp)
         {
-            foundSignature = null;
-            foundTimestamp = null;
+            foundSignature = string.Empty;
+            foundTimestamp = string.Empty;
 
-            List<KeyValuePair<string, string>> pairs = new List<KeyValuePair<string, string>>();
+            var pairs = new List<KeyValuePair<string, string>>();
             foreach(var pair in values)
             {
-                pairs.Add(new KeyValuePair<string, string>(pair.Key, pair.Value));
+                pairs.Add(new KeyValuePair<string, string>(pair.Key, pair.Value!));
             }
             pairs.Sort((a, b) => string.CompareOrdinal(a.Key, b.Key));
             var payload = new StringBuilder();

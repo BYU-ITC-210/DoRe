@@ -28,7 +28,6 @@ namespace Bredd.CodeBit
         /// </remarks>
         public static string Hash(string password)
         {
-            if (string.IsNullOrEmpty(password)) return null;
             return HashPassword(RandomNumberGenerator.GetBytes(c_saltBytes), password);
         }
 

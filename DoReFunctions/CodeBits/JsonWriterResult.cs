@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -15,10 +14,10 @@ namespace Bredd.Json {
             ContentType = "application/json";
         }
 
-        public System.Text.Json.Utf8JsonWriter OpenWriter()
+        public Utf8JsonWriter OpenWriter()
         {
-            var options = new System.Text.Json.JsonWriterOptions() { Indented = true };
-            return new System.Text.Json.Utf8JsonWriter(ResultStream, options);
+            var options = new JsonWriterOptions() { Indented = true };
+            return new Utf8JsonWriter(ResultStream, options);
         }
     } // class JsonWriterResult
 
@@ -56,7 +55,7 @@ namespace Bredd.Json {
             private const int c_pageSize = 4 * 1024;
 
             private LinkedList<byte[]> m_buffer = new LinkedList<byte[]>();
-            private byte[] m_currentPage = null;
+            private byte[]? m_currentPage = null;
             private int m_pagePos = 0;
             private bool m_disposed = false;
 

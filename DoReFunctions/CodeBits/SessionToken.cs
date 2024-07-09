@@ -28,7 +28,7 @@ namespace FileMeta.CodeBit
         public const int KeySize = 32; // In bytes
 
         int m_newestKeyId = 0;
-        SessionTokenKey[] m_keys = new SessionTokenKey[KeyIdLimit];
+        SessionTokenKey?[] m_keys = new SessionTokenKey[KeyIdLimit];
 
         static Encoding Utf8NoBom = new UTF8Encoding(false);
 
@@ -49,7 +49,7 @@ namespace FileMeta.CodeBit
         {
             m_keys[key.Id] = key;
             if (m_keys[m_newestKeyId] is null
-                || key.Created >= m_keys[m_newestKeyId].Created)
+                || key.Created >= m_keys[m_newestKeyId]!.Created)
             {
                 m_newestKeyId = key.Id;
             }
@@ -102,12 +102,12 @@ namespace FileMeta.CodeBit
         {
             get
             {
-                return m_keys[m_newestKeyId];
+                return m_keys[m_newestKeyId]!;
             }
         }
 
         /// <summary>
-        /// Get all key
+        /// Get all keys
         /// </summary>
         /// <returns>An array of keys.</returns>
         /// <remarks>
@@ -119,7 +119,7 @@ namespace FileMeta.CodeBit
             int c = 0;
             for (int i=0; i<KeyIdLimit; ++i)
             {
-                if (m_keys[i] is not null) keys[c++] = m_keys[i];
+                if (m_keys[i] is not null) keys[c++] = m_keys[i]!;
             }
             return keys;
         }
@@ -213,7 +213,7 @@ namespace FileMeta.CodeBit
                     }
 
                     var mac = WebEncoders.Base64UrlDecode(value.Substring(macPos + 4));
-                    var match = GenerateMac(m_keys[keyId], query);
+                    var match = GenerateMac(m_keys[keyId]!, query);
                     if (mac.SequenceEqual(match))
                     {
                         macStatus = SessionTokenStatus.Valid;
