@@ -16,7 +16,7 @@ namespace Bredd.CodeBit;
 /// Access Control for Azure Functions
 /// </summary>
 /// <remarks>
-/// <para>Provides access control by storing session tokens in two way. The two
+/// <para>Provides access control by storing session tokens in two ways. The two
 /// methods can be used together but usually one or the other will be used.
 /// </para>
 /// <para>For a UI application directly accessing date, session tokens are transmitted
@@ -40,6 +40,8 @@ static class AccessControl {
     const string c_authCookie = "SessionToken";
     const string c_bearerPrefix = "Bearer ";
     const string c_itemsTokenKey = "_SessionToken_";
+    const string c_authorizationHeader = "Authorization";
+    const string c_authenticationInfoHeader = "Authentication-Info";
 
     static readonly Encoding s_UTF8 = new UTF8Encoding(false);
 
@@ -143,7 +145,7 @@ static class AccessControl {
         }
 
         // Look for an Authorization header
-        foreach (var value in req.Headers["Authorization"]) {
+        foreach (var value in req.Headers[c_authorizationHeader]) {
             if (value!.StartsWith(c_bearerPrefix, StringComparison.OrdinalIgnoreCase)) {
                 var token = ReadToken(req.HttpContext, value.Substring(c_bearerPrefix.Length).Trim());
                 if (token.IsValid) {
@@ -225,12 +227,29 @@ static class AccessControl {
     }
 
     /// <summary>
-    /// Clear the authentication cookie.
+    /// Sign a token and set the Authentication-Info header with its value 
+    /// </summary>
+    /// <param name="token">The <see cref="SessionToken"/> to be signed and set.</param>
+    /// <param name="context">The <see cref="HttpContext"/> of the current request.</param>
+    /// <returns>The signed token in string form.</returns>
+    public static string SetAuthHeader(SessionToken token, HttpContext context) {
+        var signed = SignToken(context, token);
+        var res = context.Response;
+        res.Headers[c_authenticationInfoHeader] = "Bearer-Update = " + signed;
+        res.Headers["Access-Control-Expose-Headers"] = c_authenticationInfoHeader;
+        return signed;
+    }
+
+    /// <summary>
+    /// Clear authentication cookie and/or authentication header.
     /// </summary>
     /// <param name="context">The <see cref="HttpContext"/> of the current request.</param>
     /// <remarks>This is typically used to log out the user.</remarks>
-    public static void ClearAuthCookie(HttpContext context) {
-        context.Response.Cookies.Delete(c_authCookie);
+    public static void ClearAuthentication(HttpContext context) {
+        if (context.Request.Cookies.ContainsKey(c_authCookie))
+            context.Response.Cookies.Delete(c_authCookie);
+        if (context.Request.Headers.ContainsKey(c_authorizationHeader))
+            context.Response.Headers[c_authenticationInfoHeader] = "Bearer-Update = clear";
     }
 
     /// <summary>
@@ -260,7 +279,7 @@ static class AccessControl {
 
         var res = req.HttpContext.Response;
         res.Headers["Access-Control-Allow-Origin"] = origin;
-        res.Headers["Access-Control-Expose-Headers"] = "Authentication-Info";
+        res.Headers["Access-Control-Expose-Headers"] = c_authenticationInfoHeader;
         return null;
     }
 
@@ -424,8 +443,8 @@ static class AccessControl {
         // This only works if the client recognizes Authentication-Info: Refresh-Token
         var refreshed = s_tokenMgr.Refresh(token);
         var res = http.Response;
-        res.Headers["Authentication-Info"] = "Bearer-Update = " + refreshed;
-        res.Headers["Access-Control-Expose-Headers"] = "Authentication-Info";
+        res.Headers[c_authenticationInfoHeader] = "Bearer-Update = " + refreshed;
+        res.Headers["Access-Control-Expose-Headers"] = c_authenticationInfoHeader;
     }
 
     private static string GetOrigin(HttpRequest req) {
@@ -438,33 +457,3 @@ static class AccessControl {
     }
 
 } // Class AccessControl
-
-class JsonAccessTokenResult : ActionResult {
-    string m_token;
-    int m_expiresInSeconds; // in seconds
-
-    public JsonAccessTokenResult(string token, TimeSpan expiresIn) {
-        m_token = token;
-        m_expiresInSeconds = (int)Math.Ceiling(expiresIn.TotalSeconds);
-    }
-
-    public JsonAccessTokenResult(string token, int expiresInSeconds) {
-        m_token = token;
-        m_expiresInSeconds = expiresInSeconds;
-    }
-
-    public override Task ExecuteResultAsync(ActionContext context) {
-        var res = context.HttpContext.Response;
-        res.ContentType = "application/json";
-        res.Headers["Authentication-Info"] = "Bearer-Update = " + m_token;
-        return res.WriteAsync(string.Format(c_jsonBody, m_token, m_expiresInSeconds));
-    }
-
-    const string c_jsonBody =
-@"{{
-    ""accessToken"": ""{0}"",
-    ""tokenType"": ""Bearer"",
-    ""expiresIn"": ""{1}""
-}}";
-
-} // Class JsonAccessTokenResult
