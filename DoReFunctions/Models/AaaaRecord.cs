@@ -59,7 +59,7 @@ namespace DnsForItLearningLabs
         public static readonly AaaaRecordAccessor Instance = new AaaaRecordAccessor();
         private AaaaRecordAccessor() { }
 
-        public async Task<AaaaRecord> GetAsync(DnsZoneResource dnsZone, string domain)
+        public async Task<AaaaRecord?> GetAsync(DnsZoneResource dnsZone, string domain)
         {
             var resource = await GetResource(dnsZone, domain);
             if (resource == null) return null;
@@ -79,7 +79,7 @@ namespace DnsForItLearningLabs
             return true;
         }
 
-        static async Task<DnsAaaaRecordResource> GetResource(DnsZoneResource dnsZone, string domain)
+        static async Task<DnsAaaaRecordResource?> GetResource(DnsZoneResource dnsZone, string domain)
         {
             try
             {

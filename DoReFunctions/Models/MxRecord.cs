@@ -45,7 +45,7 @@ namespace DnsForItLearningLabs
         public static readonly MxRecordAccessor Instance = new MxRecordAccessor();
         private MxRecordAccessor() { }
 
-        public async Task<MxRecord> GetAsync(DnsZoneResource dnsZone, string domain)
+        public async Task<MxRecord?> GetAsync(DnsZoneResource dnsZone, string domain)
         {
             var resource = await GetResource(dnsZone, domain);
             if (resource == null) return null;
@@ -65,7 +65,7 @@ namespace DnsForItLearningLabs
             return true;
         }
 
-        static async Task<DnsMXRecordResource> GetResource(DnsZoneResource dnsZone, string domain)
+        static async Task<DnsMXRecordResource?> GetResource(DnsZoneResource dnsZone, string domain)
         {
             try
             {

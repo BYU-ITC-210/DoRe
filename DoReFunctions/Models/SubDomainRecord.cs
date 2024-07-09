@@ -30,9 +30,9 @@ namespace DnsForItLearningLabs
             OwnerName = meta.GetString("ownerName");
         }
 
-        public string Owner { get; set; }
-        public string Context { get; set; }
-        public string OwnerName { get; set; }
+        public string? Owner { get; set; }
+        public string? Context { get; set; }
+        public string? OwnerName { get; set; }
 
         public DnsSrvRecordData ToDnsRecord()
         {
@@ -58,7 +58,7 @@ namespace DnsForItLearningLabs
         public static readonly SubDomainRecordAccessor Instance = new SubDomainRecordAccessor();
         private SubDomainRecordAccessor() { }
 
-        public async Task<SubDomainRecord> GetAsync(DnsZoneResource dnsZone, string domain)
+        public async Task<SubDomainRecord?> GetAsync(DnsZoneResource dnsZone, string domain)
         {
             var resource = await GetResource(dnsZone, domain);
             if (resource == null) return null;
@@ -78,7 +78,7 @@ namespace DnsForItLearningLabs
             return true;
         }
 
-        public async Task<DnsSrvRecordResource> GetResource(DnsZoneResource dnsZone, string domain)
+        public async Task<DnsSrvRecordResource?> GetResource(DnsZoneResource dnsZone, string domain)
         {
             try
             {

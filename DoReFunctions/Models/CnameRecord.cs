@@ -21,7 +21,7 @@ namespace DnsForItLearningLabs
             Cname = record.Cname;
         }
 
-        public string Cname { get; set; }
+        public string? Cname { get; set; }
 
         public DnsCnameRecordData ToDnsRecord()
         {
@@ -39,7 +39,7 @@ namespace DnsForItLearningLabs
         public static readonly CnameRecordAccessor Instance = new CnameRecordAccessor();
         private CnameRecordAccessor() { }
 
-        public async Task<CnameRecord> GetAsync(DnsZoneResource dnsZone, string domain)
+        public async Task<CnameRecord?> GetAsync(DnsZoneResource dnsZone, string domain)
         {
             var resource = await GetResource(dnsZone, domain);
             if (resource == null) return null;
@@ -59,7 +59,7 @@ namespace DnsForItLearningLabs
             return true;
         }
 
-        static async Task<DnsCnameRecordResource> GetResource(DnsZoneResource dnsZone, string domain)
+        static async Task<DnsCnameRecordResource?> GetResource(DnsZoneResource dnsZone, string domain)
         {
             try
             {
