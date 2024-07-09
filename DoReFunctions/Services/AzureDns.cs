@@ -9,7 +9,7 @@ namespace DnsForItLearningLabs
 {
     internal static class AzureDns
     {
-        static DnsZoneResource c_dnsZone;
+        static DnsZoneResource? c_dnsZone;
 
         public static DnsZoneResource GetDnsZone()
         {
@@ -40,7 +40,7 @@ namespace DnsForItLearningLabs
             throw new ApplicationException($"DnsZone '{Configuration.DnsZone}' does not exist or access has not been granted.");
         }
         
-        public static string ReadTag(string tagName)
+        public static string? ReadTag(string tagName)
         {
             var tags = GetDnsZone().GetTagResource().Get().Value;
             if (tags.Data.TagValues.TryGetValue(tagName, out var value)) return value;
@@ -66,7 +66,8 @@ namespace DnsForItLearningLabs
             // Must always succeed in some way
             try
             {
-                var content = ex.GetRawResponse().Content.ToString();
+                var content = ex.GetRawResponse()?.Content?.ToString();
+                if (content == null) return new MessageResult(ex.Status, ex.Message);
                 var json = JsonSerializer.Deserialize<AzureErrorMessage>(content)!;
                 return new MessageResult(ex.Status, json.Message);
             }

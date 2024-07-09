@@ -26,7 +26,7 @@ namespace DnsForItLearningLabs
 
         static Configuration()
         {
-            DnsZone = Environment.GetEnvironmentVariable("dns_zone", EnvironmentVariableTarget.Process);
+            DnsZone = Environment.GetEnvironmentVariable("dns_zone", EnvironmentVariableTarget.Process) ?? string.Empty;
             AzureCredential = new DefaultAzureCredential(s_credOptions);
         }
     }

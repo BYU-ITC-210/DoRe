@@ -12,14 +12,13 @@ namespace DnsForItLearningLabs
     {
         public static string GetString(this IDictionary<string, string> dictionary, string key)
         {
-            string value;
-            if (dictionary.TryGetValue(key, out value)) return value;
+            if (dictionary.TryGetValue(key, out string? value)) return value;
             return string.Empty;
         }
 
         public static DateTime GetDateTime(this IDictionary<string, string> dictionary, string key)
         {
-            if (dictionary.TryGetValue(key, out string value))
+            if (dictionary.TryGetValue(key, out string? value))
             {
                 if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces,
                     out DateTimeOffset dt))
