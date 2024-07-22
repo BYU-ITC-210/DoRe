@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Bredd.CodeBit;
@@ -16,6 +17,7 @@ var host = new HostBuilder()
             options.JsonSerializerOptions.Converters.Add(JsonDateTimeConverter.Instance);
             options.JsonSerializerOptions.WriteIndented = true;
             options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+            options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
         });
     })
     .ConfigureServices(services => {
