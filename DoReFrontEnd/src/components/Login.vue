@@ -52,7 +52,7 @@ export default {
       );
       if (response.ok) {
         const data = await response.json();
-        sessionStorage.setItem("token", data.access_token);
+        sessionStorage.setItem("token", data.accessToken);
         this.$router.push({ name: "home" });
       } else {
         alert("Login failed, please check your username and password");
