@@ -12,6 +12,7 @@ There is not yet an automated deployment script - deployment must be done by han
 2. Create a Microsoft Azure account if you do not have one yet. See Azure documentation for the various billing options. The initial deployment uses a pay-as-you-go subscription billed to a credit card.
 3. On the Azure portal, create a `DNS Zone` (not a Private DNS zone and not a DNS private resolver).
     1. Follow the instructions to name the zone the same as the zone registered in step 1.
+    2. In your domain registrar (from step 1) set the nameservers to the values provided by the Azure DNS service.
 4. On the Azure portal, create a `Function App`.
     1. The default domain name of the server will be on the ".azurewebsites.net" domain.  E.g. "phred.azurewebsites.net". Give it a name that describes its use. E.g. "dnsforexample.azurewebsites.net". Later, you will be able to give the server a custom domain name.
     2. Runtime stack is ".NET"
@@ -24,13 +25,14 @@ There is not yet an automated deployment script - deployment must be done by han
     9. Enable network injection: "Off"
     10. Enable Application Insights: "No" (Just to begin with. You can add application insights later.)
     11. Continuous Deployment: "Disable"
+    12. Basic Authentication: "Enable"
     12. Tags: Don't add any at present though you will add some later.
     13. Wait for deployment to complete.
 5. Deploy your function app to the Azure cloud
     1. In Visual Studio open the DnsForItLearningLabs solution.
     2. In the menu, pick **Build > Publish Selection**
     3. Create a new publish profile.
-    4. Select **Azure** ad the publish destination.
+    4. Select **Azure** and the publish destination.
     5. Select **Azure Function App (Windows)** as the "specific target"
     6. On the Publish step make sure the right Microsoft account is selected in the upper-right. It should be the same account you used to create the Function App on the Azure portal.
     7. Select the correct Azure subscription.
@@ -41,8 +43,8 @@ There is not yet an automated deployment script - deployment must be done by han
     12. Wait until the application publish operation is complete.
 6. Grant the **Function App** access to your **DNS Zone**
     1. In the Azure Portal select the **Function App** you created in step 4.
-    2. Select **Identity** in the left column.
-    3. In the **System assigned** tab set **Status** to **On**.
+    2. Select **Settings > Identity** in the left column.
+    3. In the **System assigned** tab set **Status** to **On** and click **Save**.
     4. When it asks, "Enable system assigned managed identity" select **Yes**.
     5. In the Azure Portal select the **DNS Zone** you created in step 3.
     6. Select **Access Control (IAM)** in the left column.
@@ -56,10 +58,10 @@ There is not yet an automated deployment script - deployment must be done by han
     11. Verify the assigned access by clicking the **Role assignments** tab.
 7. Configure your **Function App**
     1. In the Azure Portal access your **Function App**
-    2. Select **Configuration** in the left column.
-    3. In the **Application Settings** tab click **+ New application setting**
+    2. Select **Settings > Environment variables** in the left column.
+    3. In the **App Settings** tab click **+ Add**
     4. Set **Name** to **dns_zone** and value to the domain name you registered in step 1. E.g. "example.com"
-    5. Click **OK** and then click **Save** at the top of the screen to save the setting.
+    5. Click **OK** and then click **Apply** at the bottom of the screen to save the setting.
 8. Configure an admin account and test the application.<br/>*Technically, an admin account isn't required. The application will function with just LTI authentication from your LMS. But, having an admin account is helpful for testing and diagnostics.*
     1. Browse to https://&lt;yourAppName&gt;.azurewebsites.net/util. Use the name of the **Function App** upi created in step 4. Make sure you include "/util" for the path.
     2. Under **Hash Password**, select "admin" for the account type, choose a username and password, and click **Submit**.
