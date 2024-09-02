@@ -22,16 +22,16 @@
     <None Update="c\callapi.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\css\about.a1bed806.css">
+    <None Update="c\css\about.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\css\chunk-vendors.3eef3c85.css">
+    <None Update="c\css\chunk-vendors.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\css\index.288d4402.css">
+    <None Update="c\css\index.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\css\login.288d4402.css">
+    <None Update="c\css\login.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="c\favicon.ico">
@@ -40,19 +40,19 @@
     <None Update="c\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\js\about.2a891d59.js">
+    <None Update="c\js\about.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\js\chunk-common.af586112.js">
+    <None Update="c\js\chunk-common.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\js\chunk-vendors.cefef594.js">
+    <None Update="c\js\chunk-vendors.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\js\index.7e203a65.js">
+    <None Update="c\js\index.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="c\js\login.45fc1923.js">
+    <None Update="c\js\login.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="c\login.html">

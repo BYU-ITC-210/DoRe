@@ -6,7 +6,7 @@ module.exports = defineConfig({
     ? '/c/'
     : '/',
   outputDir: process.env.NODE_ENV === 'production'
-    ? './../DnsForItLearningLabs/c'
+    ? './../DoReFunctions/c'
     : 'dist',
   pages: {
     index: "./src/main.js",
