@@ -28,13 +28,11 @@ public class StaticFilesFunction {
         HttpRequest req) {
         // Load the configuration if this is the first time in.
         if (s_physicalBasePath is null) {
-            var root = Environment.GetEnvironmentVariable("static_root");
-            if (string.IsNullOrEmpty(root)) {
-                root = Environment.GetEnvironmentVariable("AzureWebJobsScriptRoot")
-                    ?? Environment.GetEnvironmentVariable("HOME") + "/site/wwwroot";
-            }
+            //The HOMELOCAL variable is set when the server is run in debug mode. This is the default mode when locally testing on Visual studio. HOME is set automatically in the 
+            //live deployment on Azure
+            string root = Environment.GetEnvironmentVariable("HOMELOCAL") ?? Environment.GetEnvironmentVariable("HOME") + @"\site\wwwroot";
+            //the s_physicalBasePath is the full path to the folder that contains the static files
             s_physicalBasePath = Path.Combine(root, c_physicalPrefix);
-            m_logger.LogInformation($"StaticFilesFunction: root={s_physicalBasePath}");
         }
 
         //log.LogInformation($"StaticFilesFunction Path: Path={req.Path} PathBase={req.PathBase}");
