@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace DnsForItLearningLabs.Functions;
 
@@ -28,14 +29,19 @@ public class StaticFilesFunction {
         HttpRequest req) {
         // Load the configuration if this is the first time in.
         if (s_physicalBasePath is null) {
-            //The HOMELOCAL variable is set when the server is run in debug mode. This is the default mode when locally testing on Visual studio. HOME is set automatically in the 
-            //live deployment on Azure
-            string root = Environment.GetEnvironmentVariable("HOMELOCAL") ?? Environment.GetEnvironmentVariable("HOME") + @"\site\wwwroot";
+            // The HOME is set automatically in the live deployment on Azure. If it is null then we are probably running in
+            // debug mode on the local machine.
+            string root = Environment.GetEnvironmentVariable("HOME");
+            if (root == null) {
+                root = Path.GetDirectoryName(typeof(StaticFilesFunction).Assembly.Location)!;
+            }
+            else {
+                root = root + @"\site\wwwroot";
+            }
             //the s_physicalBasePath is the full path to the folder that contains the static files
-            s_physicalBasePath = Path.Combine(root, c_physicalPrefix);
+            s_physicalBasePath = Path.Combine(root , c_physicalPrefix);
+            Debug.WriteLine($"Physical Files: {s_physicalBasePath}");
         }
-
-        //log.LogInformation($"StaticFilesFunction Path: Path={req.Path} PathBase={req.PathBase}");
 
         string path = req.Path;
         if (path.StartsWith(c_routePrefix))
