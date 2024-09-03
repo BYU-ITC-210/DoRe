@@ -30,7 +30,7 @@ internal class TxtRecord : DnsRecord {
         Values = values;
     }
 
-    public IList<string> Values { get; }
+    public List<string> Values { get; set; }
 
     public DnsTxtRecordData ToDnsRecord() {
         var data = new DnsTxtRecordData();
