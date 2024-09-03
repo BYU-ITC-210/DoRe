@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using Microsoft.Net.Http.Headers;
 
 namespace DnsForItLearningLabs.Functions;
 
@@ -25,7 +26,7 @@ public class StaticFilesFunction {
 
     [Function("StaticFiles")]
     public IActionResult Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = c_route)]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "head", Route = c_route)]
         HttpRequest req) {
         // Load the configuration if this is the first time in.
         if (s_physicalBasePath is null) {
@@ -73,10 +74,6 @@ public class StaticFilesFunction {
                 return new NotFoundResult();
             }
         }
-        else if (!File.Exists(physicalPath)) {
-            m_logger.LogWarning($"File not found: {physicalPath}");
-            return new NotFoundResult();
-        }
 
 #if DEBUG
         // This code supports dynamically updating the static content locally without
@@ -95,7 +92,17 @@ public class StaticFilesFunction {
         }
 #endif
 
-        return new PhysicalFileResult(physicalPath, GetContentType(physicalPath));
+        // Get file info
+        var fileInfo = new FileInfo(physicalPath)!;
+        if (!fileInfo.Exists) {
+            m_logger.LogWarning($"File not found: {physicalPath}");
+            return new NotFoundResult();
+        }
+
+        // Generate an eTag
+        // For some reason, EntityTagHeaderValue requires that the etag be surrounded by quotes.
+        var etag = new EntityTagHeaderValue($"\"{fileInfo.Length}{fileInfo.LastWriteTimeUtc.Ticks}\"", false);
+        return new PhysicalFileResult(physicalPath, GetContentType(physicalPath)) { EnableRangeProcessing = true, EntityTag = etag };
     }
 
     static readonly char[] s_slashes = new char[] { '/', '\\' };
