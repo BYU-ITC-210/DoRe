@@ -6,7 +6,9 @@ namespace DnsForItLearningLabs;
 
 static class JsonHelp {
     public static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions() {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
     };
 
     public static readonly JsonWriterOptions WriterOptions = new JsonWriterOptions() {

@@ -20,7 +20,7 @@ internal class MxRecord : DnsRecord {
         Values = new List<DnsMXRecordInfo>(record.DnsMXRecords);
     }
 
-    public IList<DnsMXRecordInfo> Values { get; }
+    public IList<DnsMXRecordInfo> Values { get; set; }
 
     public DnsMXRecordData ToDnsRecord() {
         var data = new DnsMXRecordData();

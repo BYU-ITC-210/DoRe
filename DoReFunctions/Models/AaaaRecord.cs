@@ -29,7 +29,7 @@ internal class AaaaRecord : DnsRecord {
         Values = values;
     }
 
-    public IList<string> Values { get; }
+    public IList<string> Values { get; set; }
 
     public DnsAaaaRecordData ToDnsRecord() {
         var data = new DnsAaaaRecordData();
